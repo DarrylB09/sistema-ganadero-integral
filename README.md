@@ -1,2 +1,2 @@
 # sistema-ganadero-integral
-Sistema de Producción Láctea desarrollado en Python. Permite registrar ganado vacuno, almacenar su producción diaria, generar reportes, consultar promedios y analizar el rendimiento total del hato lechero. Proyecto final realizado como práctica de programación en consola.
+Sistema Ganadero Integral es una aplicación desarrollada en Python y ejecutada completamente por consola, que integra tres módulos principales: Registro de Ganado, Producción Láctea y Control Sanitario. El sistema permite administrar de forma centralizada los animales del hato, registrar vacas de ordeño y su producción de leche, y gestionar fichas sanitarias con vacunas y tratamientos, todo mediante menús interactivos, validación de datos y estructura modular.
