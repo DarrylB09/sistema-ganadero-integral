@@ -1,8 +1,17 @@
 # registro_ganado.py
 # Subsistema: Registro general de ganado
 
-def sistema_registro_ganado(animales):
+CATEGORIAS = [
+    "Vaca de ordeño",
+    "Vaca seca",
+    "Toro",
+    "Novillo",
+    "Ternero",
+    "Ganado de engorde",
+]
 
+
+def sistema_registro_ganado(animales):
     while True:
         mostrar_menu_registro()
         opcion = input("Elige una opción: ").strip()
@@ -23,7 +32,7 @@ def sistema_registro_ganado(animales):
             print("Volviendo al menú principal...\n")
             break
         else:
-            print("Opción inválida.\n")
+            print("Opción no válida.\n")
 
 
 def mostrar_menu_registro():
@@ -40,7 +49,30 @@ def mostrar_menu_registro():
     print("======================================")
 
 
-# ----------- LÓGICA ----------- #
+# --------- FUNCIONES DE APOYO --------- #
+
+def pedir_float(mensaje):
+    while True:
+        valor = input(mensaje).strip()
+        try:
+            return float(valor)
+        except ValueError:
+            print("Formato incorrecto. Ingresa un número válido.\n")
+
+
+def elegir_categoria():
+    print("\nElige la categoría del animal:")
+    for i, cat in enumerate(CATEGORIAS, start=1):
+        print(f"{i}. {cat}")
+
+    while True:
+        opcion = input("Opción: ").strip()
+        if opcion.isdigit():
+            indice = int(opcion)
+            if 1 <= indice <= len(CATEGORIAS):
+                return CATEGORIAS[indice - 1]
+        print("Opción inválida. Intenta de nuevo.\n")
+
 
 def crear_animal(id_animal, nombre, raza, edad, peso, sexo, categoria, notas):
     return {
@@ -51,7 +83,7 @@ def crear_animal(id_animal, nombre, raza, edad, peso, sexo, categoria, notas):
         "peso": peso,
         "sexo": sexo,
         "categoria": categoria,
-        "notas": notas
+        "notas": notas,
     }
 
 
@@ -72,104 +104,121 @@ def eliminar_animal_por_id(animales, id_animal):
 
 def calcular_estadisticas_hato(animales):
     if not animales:
-        return {"total":0, "peso_total":0, "promedio":0, "categorias":{}}
+        return {"total": 0, "peso_total": 0, "promedio": 0, "categorias": {}}
 
     total = len(animales)
     peso_total = sum(a["peso"] for a in animales)
-
     categorias = {}
+
     for a in animales:
-        categorias[a["categoria"]] = categorias.get(a["categoria"],0) + 1
+        cat = a["categoria"]
+        categorias[cat] = categorias.get(cat, 0) + 1
 
     return {
         "total": total,
         "peso_total": peso_total,
         "promedio": peso_total / total,
-        "categorias": categorias
+        "categorias": categorias,
     }
 
 
-# ----------- INTERACCIÓN ----------- #
+# --------- INTERACCIÓN --------- #
 
 def registrar_animal(animales):
     print("\n--- Registrar nuevo animal ---")
-
-    id_animal = input("ID: ").strip()
+    id_animal = input("ID del animal: ").strip()
     if buscar_animal_por_id(animales, id_animal):
-        print("Ese ID ya existe.\n")
+        print("Ya existe un animal con ese ID.\n")
         return
 
     nombre = input("Nombre: ").strip()
     raza = input("Raza: ").strip()
-    edad = float(input("Edad (años): "))
-    peso = float(input("Peso (kg): "))
+    edad = pedir_float("Edad (años): ")
+    peso = pedir_float("Peso (kg): ")
     sexo = input("Sexo (M/H): ").strip().upper()
-    categoria = input("Categoría: ").strip()
-    notas = input("Notas: ").strip()
+    categoria = elegir_categoria()
+    notas = input("Notas (opcional): ").strip()
 
-    animales.append(
-        crear_animal(id_animal, nombre, raza, edad, peso, sexo, categoria, notas)
-    )
-    print("Animal registrado.\n")
+    animal = crear_animal(id_animal, nombre, raza, edad, peso, sexo, categoria, notas)
+    animales.append(animal)
+    print(f"Animal '{nombre}' registrado correctamente.\n")
 
 
 def listar_animales(animales):
-    print("\n--- Lista del ganado ---")
+    print("\n--- Lista de animales registrados ---")
     if not animales:
-        print("Sin animales.\n")
+        print("No hay animales registrados.\n")
         return
 
     for a in animales:
-        print(f"ID:{a['id']} | {a['nombre']} | {a['raza']} | {a['peso']}kg | {a['categoria']}")
+        print(
+            f"ID:{a['id']} | Nombre:{a['nombre']} | Raza:{a['raza']} | "
+            f"Edad:{a['edad']} años | Peso:{a['peso']} kg | Sexo:{a['sexo']} | "
+            f"Categoría:{a['categoria']}"
+        )
     print()
 
 
 def buscar_animal_por_id_interactivo(animales):
-    id_animal = input("ID: ").strip()
-    a = buscar_animal_por_id(animales, id_animal)
-
-    if not a:
-        print("No encontrado.\n")
+    print("\n--- Buscar animal por ID ---")
+    if not animales:
+        print("No hay animales registrados.\n")
         return
 
-    print("\n--- Datos del animal ---")
-    for k,v in a.items():
+    id_animal = input("ID: ").strip()
+    a = buscar_animal_por_id(animales, id_animal)
+    if not a:
+        print("No se encontró un animal con ese ID.\n")
+        return
+
+    print("\nInformación del animal:")
+    for k, v in a.items():
         print(f"{k.capitalize()}: {v}")
     print()
 
 
 def actualizar_peso(animales):
-    id_animal = input("ID del animal: ").strip()
-    a = buscar_animal_por_id(animales, id_animal)
-
-    if not a:
-        print("ID no encontrado.\n")
+    print("\n--- Actualizar peso ---")
+    if not animales:
+        print("No hay animales registrados.\n")
         return
 
-    nuevo = float(input("Nuevo peso: "))
-    a["peso"] = nuevo
+    id_animal = input("ID del animal: ").strip()
+    a = buscar_animal_por_id(animales, id_animal)
+    if not a:
+        print("No se encontró ese ID.\n")
+        return
+
+    print(f"Peso actual de {a['nombre']}: {a['peso']} kg")
+    nuevo_peso = pedir_float("Nuevo peso (kg): ")
+    a["peso"] = nuevo_peso
     print("Peso actualizado.\n")
 
 
 def eliminar_animal(animales):
+    print("\n--- Eliminar animal ---")
+    if not animales:
+        print("No hay animales registrados.\n")
+        return
+
     id_animal = input("ID a eliminar: ").strip()
     if eliminar_animal_por_id(animales, id_animal):
-        print("Eliminado.\n")
+        print("Animal eliminado.\n")
     else:
-        print("No encontrado.\n")
+        print("No se encontró ese ID.\n")
 
 
 def mostrar_estadisticas(animales):
+    print("\n--- Estadísticas del hato ---")
     stats = calcular_estadisticas_hato(animales)
     if stats["total"] == 0:
-        print("Sin datos.\n")
+        print("No hay datos.\n")
         return
 
-    print("\n--- Estadísticas del hato ---")
-    print(f"Total animales: {stats['total']}")
+    print(f"Total de animales: {stats['total']}")
     print(f"Peso total: {stats['peso_total']} kg")
-    print(f"Promedio: {stats['promedio']:.2f} kg")
-    print("Categorías:")
-    for c,n in stats["categorias"].items():
-        print(f"  - {c}: {n}")
+    print(f"Peso promedio: {stats['promedio']:.2f} kg")
+    print("Animales por categoría:")
+    for cat, n in stats["categorias"].items():
+        print(f" - {cat}: {n}")
     print()

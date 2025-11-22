@@ -1,5 +1,3 @@
-# main.py
-
 """
 Sistema Ganadero Integral
 
@@ -9,9 +7,8 @@ Este programa reúne tres módulos principales:
    producción de leche y estadísticas.
 3. Control Sanitario – gestiona fichas de salud, vacunas y tratamientos.
 
-El archivo main.py funciona como menú central y comparte las listas
-de datos entre los módulos, permitiendo que todo el sistema trabaje
-con la misma información.
+main.py funciona como menú central y comparte las listas de datos
+entre los módulos.
 """
 
 from registro_ganado import sistema_registro_ganado
@@ -20,10 +17,10 @@ from control_sanitario import sistema_control_sanitario
 
 
 def main():
-    # LISTAS CENTRALES COMPARTIDAS ENTRE TODOS LOS MÓDULOS
-    animales = []            # Registro general del hato
-    vacas_lecheras = []      # Producción láctea
-    fichas_sanitarias = []   # Control sanitario
+    # LISTAS CENTRALES COMPARTIDAS
+    animales = []          # Registro general del hato
+    produccion = []        # Datos de producción lechera
+    fichas_sanitarias = [] # Datos de salud
 
     while True:
         mostrar_menu_principal()
@@ -31,17 +28,13 @@ def main():
 
         if opcion == "1":
             sistema_registro_ganado(animales)
-
         elif opcion == "2":
-            sistema_produccion_lactea(animales, vacas_lecheras)
-
+            sistema_produccion_lactea(animales, produccion)
         elif opcion == "3":
             sistema_control_sanitario(animales, fichas_sanitarias)
-
         elif opcion == "4":
             print("¡Gracias por usar el Sistema Ganadero Integral!")
             break
-
         else:
             print("Opción no válida.\n")
 
@@ -55,6 +48,7 @@ def mostrar_menu_principal():
     print("3. Sistema de Control Sanitario")
     print("4. Salir")
     print("======================================")
+
 
 if __name__ == "__main__":
     main()
